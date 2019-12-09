@@ -42,22 +42,26 @@ straightforward.  You will need `go` installed.
 1. Clone BoringSSL by issuing the following command:
 
 ```
-git clone https://boringssl.googlesource.com/boringssl
+git clone https://github.com/raihan001/boringssl.git
 cd boringssl
 ```
 
 You may need to install pre-requisites like zlib and libevent.
 
-2. Use specific BoringSSL version
+
+2. Compile the library
 
 ```
-git checkout 49de1fc2910524c888866c7e2b0db1ba8af2a530
-```
-
-3. Compile the library
-
-```
+==================================
+For intel
+==================================
 cmake . &&  make
+==================================
+For ARM64
+==================================
+cmake EXTRA_CMAKE_OPTIONS='-DCMAKE_C_COMPILER=arm64-linux-gcc -DCMAKE_CXX_COMPILER=arm64-linux-gnu-g++ -DCXX_STANDARD_REQUIRED=c++17 -DCMAKE_POSITION_INDEPENDENT_CODE=on' . 
+make -j4 EXTRA_CMAKE_OPTIONS='-DCMAKE_C_COMPILER=arm64-linux-gcc -DCMAKE_CXX_COMPILER=arm64-linux-gnu-g++ -DCXX_STANDARD_REQUIRED=c++17'
+
 ```
 
 Remember where BoringSSL sources are:
@@ -68,7 +72,16 @@ BORINGSSL=$PWD
 If you want to turn on optimizations, do
 
 ```
+==================================
+For intel
+==================================
 cmake -DCMAKE_BUILD_TYPE=Release . && make
+
+==================================
+For ARM64
+==================================
+cmake EXTRA_CMAKE_OPTIONS='-DCMAKE_C_COMPILER=arm64-linux-gcc -DCMAKE_CXX_COMPILER=arm64-linux-gnu-g++ -DCXX_STANDARD_REQUIRED=c++17 -DCMAKE_POSITION_INDEPENDENT_CODE=on' -DCMAKE_BUILD_TYPE=Release . 
+make -j4 EXTRA_CMAKE_OPTIONS='-DCMAKE_C_COMPILER=arm64-linux-gcc -DCMAKE_CXX_COMPILER=arm64-linux-gnu-g++ -DCXX_STANDARD_REQUIRED=c++17'
 ```
 
 Building LSQUIC Library
@@ -92,55 +105,17 @@ git submodule update
 
 ```
 # $BORINGSSL is the top-level BoringSSL directory from the previous step
-cmake -DBORINGSSL_DIR=$BORINGSSL .
-make
+cmake EXTRA_CMAKE_OPTIONS='-DCMAKE_C_COMPILER=arm64-linux-gcc -DCMAKE_CXX_COMPILER=arm64-linux-gnu-g++ -DCXX_STANDARD_REQUIRED=c++17 -DCMAKE_POSITION_INDEPENDENT_CODE=on' -DBORINGSSL_DIR=$BORINGSSL .
+make -j4 EXTRA_CMAKE_OPTIONS='-DCMAKE_C_COMPILER=arm64-linux-gcc -DCMAKE_CXX_COMPILER=arm64-linux-gnu-g++ -DCXX_STANDARD_REQUIRED=c++17'
 ```
 
 3. Run tests
 
 ```
-make test
+make -j4 EXTRA_CMAKE_OPTIONS='-DCMAKE_C_COMPILER=arm64-linux-gcc -DCMAKE_CXX_COMPILER=arm64-linux-gnu-g++ -DCXX_STANDARD_REQUIRED=c++17' test
 ```
 
-Building with Docker
----------
-The library and the example client and server can be built with Docker.
-
-Initialize Git submodules:
-```
-cd lsquic
-git submodule init
-git submodule update
-```
-
-Build the Docker image:
-```
-docker build -t lsquic .
-```
-
-Then you can use the examples from the command line.  For example:
-```
-sudo docker run -it --rm lsquic http_client -s www.google.com  -p / -o version=Q046
-sudo docker run -p 12345:12345/udp -v /path/to/certs:/mnt/certs -it --rm lsquic http_server -c www.example.com,/mnt/certs/chain,/mnt/certs/key
-```
-
-Platforms
----------
-
-The library has been tested on the following platforms:
-- Linux
-  - i386
-  - x86_64
-  - ARM (Raspberry Pi 3)
-- FreeBSD
-  - i386
-- MacOS
-  - x86_64
-- Windows (this needs updating for the server part, now broken)
-  - x86_64
 
 Have fun,
-
-LiteSpeed QUIC Team.
 
 Copyright (c) 2017 - 2019 LiteSpeed Technologies Inc
